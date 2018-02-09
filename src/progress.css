@@ -1,0 +1,171 @@
+/**
+ * 功能描述：进度条样式
+ * 
+ * 包含样式：进度条样式
+**/
+
+
+*{
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+body{
+    position: relative;
+}
+#wrapper{
+    position: relative;
+    margin: 0 auto;
+}
+
+#videoCover{
+    position: absolute;
+    width: inherit;
+    height: inherit;
+}
+#controls_wrapper{
+    position: absolute;
+    height: 55px;
+    bottom: 10px;
+}
+.progress-part{
+    width: 100%;
+    position: relative;
+    background-color: #333;
+}
+
+.progress-part p{
+    padding: 0
+}
+
+.progress-part .progress_wrapper{
+    position: relative;
+    width: 100%;
+    /*height: 13px;*/
+    padding-bottom: .3rem;
+    cursor: pointer;
+    /*display: inline-block;*/
+}
+.progress-part .progress_bg{
+    position: absolute;
+    width: 100%;
+    height: .3rem;
+    background: #7b828a;
+    transition: transform .2s;
+}
+.progress-part .progress_loaded{
+    position: absolute;
+    height: .3rem;
+    background: rgba(255,255,255,1);
+    transition: transform .2s;
+    opacity: .3;
+}
+.progress-part .progress_current{
+    position: absolute;
+    height: .3rem;
+    background-color: red;
+    transition: transform .2s;
+}
+.progress-part .progress_ball{
+    position: absolute;
+    /*top: -1px;*/
+    width: .3rem;
+    height: .3rem;
+    background: white;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    transition: transform .2s;
+}
+
+.progress-part .progress_wrapper:hover>.progress_ball{
+    transform: scale(1.8, 1.8);
+    background: white;
+}
+
+
+/*时间栏*/
+.progress-part .show-time{
+    display: inline-block;
+    vertical-align: top;
+    color: white;
+    margin-right: 10px;
+}
+
+.progress-part .show-current{
+    color: #fff;
+    font-size: .6rem;
+    margin-left: .5rem;
+    text-align: left;
+}
+.progress-part .show-duration{
+    float:right;
+    color: #fff;
+    font-size: .6rem;
+    margin-right: .5rem;
+}
+
+/*打点的样式*/
+.progress-part .dotPart{
+    position: absolute;
+    top:0;
+    /*width: 10%;*/
+}
+.progress-part .dotPart .dotPic{
+    display: none;
+    position: absolute;
+    /*top: -3rem;*/
+    /*width: 100%;*/
+}
+/*.progress-part .dotPart:hover .dotPic{
+    display: block;
+}*/
+.progress-part .dotPart .dotPic .previewPic{
+    /*width: 200px;*/
+    box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    padding: .1rem;
+    background-color: black;
+}
+.progress-part .dotPart .dotPic .triangle{
+    /*width: 100%;*/
+}
+.progress-part .dotPart .dotPic .triangle img{
+    /*width: 200px;*/
+}
+
+.progress-part .dot{
+    width: .6rem;
+    height: .6rem;
+    position: relative;
+    top:-0.15rem;
+    border-radius: 50%;
+    background-color: #d2d2d2;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    background-color: #d2d2d2;
+}
+
+/*进度条横向显示*/
+.horizontal{
+    display: inline-block;
+}
+.progress_wrapper.horizontal{
+    width: calc(100% -136px);
+}
+.timeShower span{
+    font-size: 12px;
+    /*line-height: 2;*/
+}
+.timeShower .show-duration{
+    float: none;
+    margin-left: 10px;
+    margin-right: 16px;
+}
+.timeShower .show-current{
+    margin-left: 10px;
+    margin-right: 10px;
+}
