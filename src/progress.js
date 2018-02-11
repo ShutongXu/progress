@@ -32,21 +32,16 @@ define([], function() {
         return hour + ":" + min + ":" + sec;
     }
 
-    var XProgress = function (config) {
+    var KProgress = function (config) {
         var that = this;
         // config参数
         var kvideo = config.video;
         var element = config.element;
         var color = config.color;
         var times = config.times;
-        var horizontal = config.horizontal;
 
         this.kvideo = kvideo;
-        // 记录进度条额外功能状态
-        this.states = {
-            ab:false,
-            dot:false
-        }
+       
         var currentWidth = 0;
         // 增加时间进度显示
         var currentHTML = "<p class='show-current'>00:00:00</p>"
@@ -54,34 +49,16 @@ define([], function() {
         // 增加进度条
         var progressHTML = "<div class='progress_wrapper'><div class='progress_bg'></div><div class='progress_loaded'></div><div class='progress_current'></div> <div class='progress_ball'></div></div>";
         
-        // ！！！需要先create节点才能插入innerHTML,否则会影响按钮的触发
         var progressPart = DomUtil.createDomElement("div");
         progressPart.className = "progress-part";
         element.insertBefore(progressPart, element.firstChild);
 
         var container = DomUtil.getDomByClass("progress-part", element);
         this.container = container;
-       
-        // 决定是否要横向排列
-        if (horizontal) {   
-            // container.innerHTML += progressHTML; 
-            // var wrapperDom = DomUtil.getDomByClass("progress_wrapper", element);
-            // wrapperDom.className = "progress_wrapper horizontal";
-            // var timeShower = "<p class='timeShower horizontal'><span class='show-current'>00:00:00</span><span> / </span><span class='show-duration'>00:00:00</span></p>";
-            // container.insertAdjacentHTML("afterBegin", timeShower);
-
-            container.innerHTML += progressHTML; 
-            var wrapperDom = DomUtil.getDomByClass("progress_wrapper", element);
-            wrapperDom.className = "progress_wrapper horizontal";
-            var showCurrent = "<p class='timeShower horizontal'><span class='show-current'>00:00:00</span></p>";
-            var showDuration = "<p class='timeShower horizontal'><span class='show-duration'>00:00:00</span></p>";
-            container.insertAdjacentHTML("afterBegin", showCurrent);
-            container.innerHTML += showDuration;
-        } else {
-            container.innerHTML += progressHTML;
-            container.innerHTML += durationHTML;
-            container.innerHTML += currentHTML;
-        }
+        
+        DomUtil.append(container, progressHTML);
+        DomUtil.append(container, durationHTML);
+        DomUtil.append(container, currentHTML);
 
          // 获取这些元素的dom对象
         this.progress_current = DomUtil.getDomByClass("progress_current", container);
@@ -161,7 +138,6 @@ define([], function() {
 
                 progressLoaded.style.left = left;
                 progressLoaded.style.width = width;
-              
             }
         }
 
@@ -175,9 +151,6 @@ define([], function() {
                 // 改变已播放时间,如果不加这句判断，切换视频时会报错
                 if (DomUtil.getDomByClass("show-current", container)) {
                     DomUtil.getDomByClass("show-current", container).innerText = timeFormat(kvideo.currentTime);
-                }
-                if (kvideo.info.smallVideo) {
-                    kvideo.info.smallVideo.currentTime = kvideo.currentTime;
                 }
             }
             // 播放结束改变状态
@@ -228,7 +201,6 @@ define([], function() {
                     // 继续回到A点开始播放
                     kvideo.currentTime = times.startTime;
                     kvideo.states.endPlay = true;
-                    // kvideo.play();
                 }
             }
             kvideo.ontimeupdate = function(){
@@ -271,18 +243,6 @@ define([], function() {
                 that.progress_current.style.width = (dragWidth / that.progressW) * 100 + "%";
                 that.progress_ball.style.left = (dragWidth - that.ballW) / that.progressW * 100 + "%";
                 var changeTime = (dragWidth / that.progressW) * kvideo.info.duration;
-                // 如果为区间播放的进度条
-                if (times) {
-                    changeTime += parseFloat(times.startTime);
-                }
-                kvideo.currentTime = changeTime;
-                DomUtil.getDomByClass("show-current").innerText = timeFormat(kvideo.currentTime);
-
-
-                // 保证数字放大时的小屏幕同步拖动
-                if (kvideo.info.smallVideo) {
-                    kvideo.info.smallVideo.currentTime = changeTime;
-                }
             }
             changeProgressBar(e);
 
@@ -304,112 +264,7 @@ define([], function() {
     };
 
     //进度条的方法
-    XProgress.prototype = {
-        // 设定AB点播放
-        setAB:function (aTime, bTime) {
-            var that = this;
-            var kvideo = this.kvideo;
-            var states = this.states;
-
-            // 记录状态
-            states.ab = true;
-            // 模拟点击到A点
-            kvideo.currentTime = aTime;
-            // 设定计时器到B点结束
-            kvideo.ontimeupdate = function(){
-                // 更新进度条
-                that.updateProcess();
-                // 保证AB点播放
-                if (kvideo.currentTime >= bTime) {
-                    // 继续回到A点开始播放
-                    kvideo.currentTime = aTime;
-                }
-            }
-        },
-        // 进度条打点
-        addDot:function (cfg) {
-            var that = this;
-            var kvideo = this.kvideo;
-            var states = this.states;
-            var currentTime = cfg.time;
-            var isAB = cfg.isAB;
-            // 根据时间设置点的偏移
-            var left = (parseFloat(currentTime) / kvideo.info.duration) * 100 + "%";
-            // 增加点样式
-            var dot = DomUtil.createDomElement("div");
-            dot.className = "dot";
-
-            // 增加点的区域
-            var dotPart = DomUtil.createDomElement("div");
-            dotPart.className = "dotPart";
-            dotPart.style.left = left;
-            // 判断是什么功能需要打的点
-            if (!isAB) {
-                // 记录状态
-                states.dot = true;
-            } else {
-                // 如果是ab点打点时设置的点，添加标记
-                DomUtil.setDomAttribute(dotPart, "data-ab", true);
-            }
-            var progressContainer = DomUtil.getDomByClass("progress_wrapper", that.container);
-            
-            dotPart.appendChild(dot);
-            that.container.appendChild(dotPart);
-            // 返回点的dom
-            return dotPart;
-        },
-        // 测试用的函数
-        check:function () {
-            return this.kvideo.currentTime;
-        },
-        // 清除AB点功能
-        resetAB:function () {
-            var that = this;
-            var kvideo = this.kvideo;
-            var states = this.states;
-            // 只清除AB点设置的点
-            var dots = that.container.querySelectorAll(".dotPart[data-ab='true']");
-            if (dots.length) {
-                dots.forEach(function(dot){
-                    dot.parentNode.removeChild(dot);
-                })
-            }  
-            // 清楚循环
-            if (states.ab) {
-                states.ab = false;
-                // 恢复原先的timeupadte事件
-                kvideo.ontimeupdate = function(){
-                    // 更新进度条
-                    that.updateProcess();
-                }
-            }
-            // 更改状态
-            kvideo.states.ABlooper = false;
-        },
-        // 清除打点功能
-        resetDots:function () {
-            var that = this;
-            var kvideo = this.kvideo;
-            var states = this.states;
-            if (states.dot) {
-                states.dot = false;
-                // 只清除打点设置的点
-                var dots = that.container.querySelectorAll(".dotPart:not([data-ab='true'])");
-                if (dots.length) {
-                    dots.forEach(function(dot){
-                        dot.parentNode.removeChild(dot);
-                    })
-                }  
-            }
-        },
-        // 重置额外功能
-        resetAll:function () {
-            // 清楚AB点操作
-            this.resetAB();
-            // 清楚打点操作
-            this.resetDots();
-            
-        },
+    KProgress.prototype = {
         // 播放结束时进行的操作,后一次调用会覆盖前一次
         endPlay:function (callback, endTime) {
             var that = this;
@@ -444,7 +299,7 @@ define([], function() {
            
         }
     }
-    return XProgress;
+    return KProgress;
 });
 
 
